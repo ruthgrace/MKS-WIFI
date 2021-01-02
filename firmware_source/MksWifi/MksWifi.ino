@@ -78,7 +78,7 @@ uint8_t loggedInClientsNum = 0;
 MksHTTPUpdateServer httpUpdater;
 
 char cloud_host[96] = "whycopper.com";
-int cloud_port = 12345;
+int cloud_port = 80;
 boolean cloud_enable_flag = true;
 int cloud_link_state = 0; // 0:??¨®?¡ê?1:¨º1?¨¹¡ê??¡ä¨¢??¨®¡ê?2:¨°?¨¢??¨®¡ê??¡ä¡ã¨®?¡§¡ê?3:¨°?¡ã¨®?¡§
 
@@ -684,6 +684,31 @@ void net_print(const uint8_t *sbuf, uint32_t len)
 	}
 }
 
+void net_get()
+{
+  if (!cloud_client.connect(cloud_host, cloud_port)) {
+    Serial.println("RUTH DEBUG: connection failed");
+    return;
+  }
+  String url = "/";
+  Serial.print("RUTH DEBUG: requesting URL " + url);
+  cloud_client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + cloud_host + "\r\n" + "Connection: close\r\n\r\n");
+  unsigned long timeout = millis();
+  while (cloud_client.available() == 0) {
+    if (millis() - timeout > 5000)
+    {
+      Serial.println(">>> Client Timeout !");
+      cloud_client.stop(); return; }
+  } // Read all the lines of the reply from server and print them to Serial
+  while (cloud_client.available())
+  {
+    String line = cloud_client.readStringUntil('\r');
+    Serial.print(line);
+  }
+  Serial.println();
+  Serial.println("closing connection");
+}
+
 void query_printer_inf()
 {
 	static int last_query_temp_time = 0;
@@ -793,6 +818,7 @@ void loop()
 	switch (currentState)
 	{
 		case OperatingState::Client:
+			net_get();
 			server.handleClient();
 			if(verification_flag)
 			{
