@@ -299,7 +299,7 @@
 
 >CFG_CLOUD_ENABLE		1			#cloud service enable(0:disable;  1:enable)
 >CFG_WIFI_CLOUD_HOST		whycopper.com		#cloud server url
->CFG_CLOUD_PORT			443			#cloud server port
+>CFG_CLOUD_PORT			80			#cloud server port
 >WISI_LIST_SCAN                 1                       #Whether to use wifi list scan (1: use, 0: forbidden)
 
 #Do not display wifi button 0: Display WiFi button 1: Do not display
