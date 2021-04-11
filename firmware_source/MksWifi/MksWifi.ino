@@ -686,11 +686,11 @@ void net_print(const uint8_t *sbuf, uint32_t len)
 
 void net_get()
 {
-  String url = "/hello";
-  if (!cloud_client.connect(cloud_host + url, cloud_port)) {
+  if (!cloud_client.connect(cloud_host, cloud_port)) {
     Serial.println("RUTH DEBUG: connection failed");
     return;
   }
+  String url = "/";
   Serial.print("RUTH DEBUG: requesting URL " + url);
   cloud_client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + cloud_host + "\r\n" + "Connection: close\r\n\r\n");
   unsigned long timeout = millis();
