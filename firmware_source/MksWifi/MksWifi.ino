@@ -77,9 +77,9 @@ uint8_t loggedInClientsNum = 0;
 
 MksHTTPUpdateServer httpUpdater;
 
-char cloud_host[96] = "whycopper.com";
+char cloud_host[96] = "baizhongyun.cn";
 int cloud_port = 12345;
-boolean cloud_enable_flag = true;
+boolean cloud_enable_flag = false;
 int cloud_link_state = 0; // 0:??¨®?¡ê?1:¨º1?¨¹¡ê??¡ä¨¢??¨®¡ê?2:¨°?¨¢??¨®¡ê??¡ä¡ã¨®?¡§¡ê?3:¨°?¡ã¨®?¡§
 
 RepRapWebServer server(80);
@@ -787,9 +787,11 @@ void loop()
 {
 	int i;
 
-	//output_json()
- 
+	//output_json();
+	
 	#if 1
+	
+	
 	switch (currentState)
 	{
 		case OperatingState::Client:
@@ -890,7 +892,8 @@ void loop()
 					
 						
 						if(transfer_file_flag)
-						{						
+						{
+						
 							if(!verification_flag)
 							{
 								break;
@@ -1658,7 +1661,9 @@ void do_transfer()
 	int i;
 	long useTick ;
 	long now;
-		
+	
+	
+	
 	switch(transfer_state)
 	{
 		case TRANSFER_IDLE:
@@ -4257,3 +4262,4 @@ String fileUrlEncode(char *array)
     return encodedString;
     
 }
+
