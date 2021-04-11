@@ -78,14 +78,15 @@ uint8_t loggedInClientsNum = 0;
 MksHTTPUpdateServer httpUpdater;
 
 char cloud_host[96] = "whycopper.com";
-int cloud_port = 80;
+int cloud_port = 443;
+const char* fingerprint = "C0 07 D0 6E 44 10 3F C4 86 4E A0 A0 07 9F 86 2C FE 62 48 61";
 boolean cloud_enable_flag = true;
 int cloud_link_state = 0; // 0:??¨®?¡ê?1:¨º1?¨¹¡ê??¡ä¨¢??¨®¡ê?2:¨°?¨¢??¨®¡ê??¡ä¡ã¨®?¡§¡ê?3:¨°?¡ã¨®?¡§
 
 RepRapWebServer server(80);
 
 WiFiServer tcp(8080);
-WiFiClient cloud_client;
+WiFiClientSecure cloud_client;
 //DNSServer dns;
 String wifiConfigHtml;
 
@@ -686,20 +687,29 @@ void net_print(const uint8_t *sbuf, uint32_t len)
 
 void net_get()
 {
+  Serial.println("RUTH DEBUG: entered net get.");
   if (!cloud_client.connect(cloud_host, cloud_port)) {
     Serial.println("RUTH DEBUG: connection failed");
     return;
+  }
+  Serial.println("RUTH DEBUG: connected.");
+  if (cloud_client.verify(fingerprint, cloud_host)) {
+    Serial.println("RUTH DEBUG: certificate matches");
+  } else {
+    Serial.println("RUTH DEBUG: certificate doesn't match");
   }
   String url = "/";
   Serial.print("RUTH DEBUG: requesting URL " + url);
   cloud_client.print(String("GET ") + url + " HTTP/1.1\r\n" + "Host: " + cloud_host + "\r\n" + "Connection: close\r\n\r\n");
   unsigned long timeout = millis();
+  Serial.print("RUTH DEBUG: checking timeout.");
   while (cloud_client.available() == 0) {
     if (millis() - timeout > 5000)
     {
       Serial.println(">>> Client Timeout !");
       cloud_client.stop(); return; }
   } // Read all the lines of the reply from server and print them to Serial
+  Serial.println("RUTH DEBUG: reading get.");
   while (cloud_client.available())
   {
     String line = cloud_client.readStringUntil('\r');
@@ -813,11 +823,11 @@ void loop()
 	int i;
 
 	//output_json()
- 
 	#if 1
 	switch (currentState)
 	{
 		case OperatingState::Client:
+      Serial.println("RUTH DEBUG: calling net get.");
 			net_get();
 			server.handleClient();
 			if(verification_flag)
